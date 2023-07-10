@@ -14,12 +14,28 @@ also for a quick start guide deploying https://cloud.google.com/functions/docs/c
 
 ### gcloud credentials
 
-https://cloud.google.com/docs/authentication/provide-credentials-adc
-https://cloud.google.com/docs/authentication/application-default-credentials
+You can simply run `gcloud init` to setup the project and credentials.
 
-gcloud info
+view active configs: `gcloud config list`
 
+- https://cloud.google.com/docs/authentication/provide-credentials-adc
+- https://cloud.google.com/docs/authentication/application-default-credentials
+
+get info for current env: `gcloud info`
+
+Alternative ways to setup credentials:
+
+```zsh
+# login as a user:
+gcloud auth application-default login
+
+# set a service account as the default in your env:
 export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json
+
+# view env
+# https://www.digitalocean.com/community/tutorials/how-to-read-and-set-environmental-and-shell-variables-on-linux
+printenv | grep GOOGLE_APPLICATION_CREDENTIALS
+```
 
 ### testing a function locally
 
