@@ -37,21 +37,43 @@ export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json
 printenv | grep GOOGLE_APPLICATION_CREDENTIALS
 ```
 
+When you login as a user with `gcloud auth application-default login` the credentials are stored in `~/.config/gcloud/application_default_credentials.json`
+
+Check your user folder for config credentials:
+
+`cd ~/.config/gcloud`
+
+`cat application_default_credentials.json`
+
+Show the projects that you have access to:
+
+`gcloud projects list`
+
+You can set the project that you want to use with the following command:
+
+`gcloud config set project PROJECT_ID`
+
 ### testing a function locally
 
 https://github.com/GoogleCloudPlatform/functions-framework-nodejs
 
 Spin up a local development server for quick testing during development. The Functions Framework lets you run your functions in an environment that's similar to production, to speed up development and testing.
 
-running the function locally; you need to cd into the dist folder and run the following command:
+Lets test the function locally:
 
-`npx @google-cloud/functions-framework --target=helloGET`
+```
+# Build the dist folder
+`npm run build`
 
-for the event
+# cd into the event function folder
+`cd dist/functions/events/helloWorld`
 
+# run the following command:
 `npx @google-cloud/functions-framework --target=myCloudEventFunction`
 
-send a post request to the endpoint with a cloud event.
+```
+
+we now have an endpoint running on `URL: http://localhost:8080/` and we can send a post request to the endpoint with a cloud event.
 
 ### sending a cloudevent
 
@@ -78,6 +100,19 @@ const event = new CloudEvent(ce);
 console.log(event);
 // Send it to the endpoint - encoded as HTTP binary by default
 emit(event);
+```
+
+Simply run `npm run dev` and the above code will send a cloudevent to the local endpoint.
+
+```
+Hello, World! {
+  id: '1234',
+  time: '2024-08-26T19:57:06.068Z',
+  type: 'example',
+  source: '/some/source',
+  specversion: '1.0',
+  data: { foo: 'bar' }
+}
 ```
 
 ### deploying a function
