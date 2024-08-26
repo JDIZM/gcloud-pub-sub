@@ -81,7 +81,7 @@ This script uses `src/listen.ts` to listen for messages on the "test-sub-1" subs
 
 3. Run the function locally:
    ```
-   npx @google-cloud/functions-framework --target=myCloudEventFunction
+   npx @google-cloud/functions-framework --target=helloWorld
    ```
 
 This will start a local server at `http://localhost:8080/`.
