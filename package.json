@@ -10,7 +10,9 @@
     "format:check": "prettier --check '**/*.{js,ts,mjs,cjs,json,tsx,jsx}'",
     "tsc:check": "tsc -p tsconfig.json --noEmit",
     "build": "tsc -p tsconfig.json",
-    "test": "vitest"
+    "test": "vitest",
+    "listen": "tsx src/listen.ts",
+    "send": "tsx src/sendMessage.ts"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +32,7 @@
     "vitest": "^0.31.1"
   },
   "dependencies": {
+    "@google-cloud/pubsub": "^4.6.0",
     "cloudevents": "^7.0.1"
   }
 }
