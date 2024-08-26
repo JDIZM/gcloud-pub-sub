@@ -1,93 +1,99 @@
 # gcloud-pub-sub
 
-1. https://cloud.google.com/pubsub/docs/publish-receive-messages-client-library#pubsub-client-libraries-nodejs
-2. https://cloud.google.com/functions/docs/calling/pubsub
+This project demonstrates how to work with Google Cloud Pub/Sub using Node.js, including publishing messages, listening for messages, and setting up Cloud Functions triggered by Pub/Sub events.
 
-- setup a cloudevent function that is triggered by a pubsub message / topic
-- how to setup the folder structure
-- how to deploy multiple functions instead of one via cli?
-- adding terraform
+## Setup
 
-see: https://cloud.google.com/functions/docs/running/function-frameworks#configuring_the_framework
+1. Install dependencies:
 
-also for a quick start guide deploying https://cloud.google.com/functions/docs/create-deploy-gcloud
+   ```
+   npm install
+   ```
 
-### gcloud credentials
+2. Set up Google Cloud credentials:
 
-You can simply run `gcloud init` to setup the project and credentials.
+   - Run `gcloud init` to set up the project and credentials.
+   - Alternatively, you can use one of these methods:
 
-view active configs: `gcloud config list`
+     ```zsh
+     # Login as a user:
+     gcloud auth application-default login
 
-- https://cloud.google.com/docs/authentication/provide-credentials-adc
-- https://cloud.google.com/docs/authentication/application-default-credentials
+     # Set a service account as the default in your env:
+     export GOOGLE_APPLICATION_CREDENTIALS=$HOME/path/to/your/gcloud.json
+     ```
 
-get info for current env: `gcloud info`
+3. View active configurations:
 
-Alternative ways to setup credentials:
+   ```
+   gcloud config list
+   ```
+
+4. Set your project:
+   ```
+   gcloud config set project YOUR_PROJECT_ID
+   ```
+
+## Pub/Sub Operations
+
+### Create a Topic and Subscription
 
 ```zsh
-# login as a user:
-gcloud auth application-default login
-
-# set a service account as the default in your env:
-export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json
-
-# view env
-# https://www.digitalocean.com/community/tutorials/how-to-read-and-set-environmental-and-shell-variables-on-linux
-printenv | grep GOOGLE_APPLICATION_CREDENTIALS
+gcloud pubsub topics create test-topic
+gcloud pubsub subscriptions create test-sub-1 --topic test-topic
 ```
 
-When you login as a user with `gcloud auth application-default login` the credentials are stored in `~/.config/gcloud/application_default_credentials.json`
+### Send a Message
 
-Check your user folder for config credentials:
+To publish a message to the Pub/Sub topic:
 
-`cd ~/.config/gcloud`
-
-`cat application_default_credentials.json`
-
-Show the projects that you have access to:
-
-`gcloud projects list`
-
-You can set the project that you want to use with the following command:
-
-`gcloud config set project PROJECT_ID`
-
-### testing a function locally
-
-https://github.com/GoogleCloudPlatform/functions-framework-nodejs
-
-Spin up a local development server for quick testing during development. The Functions Framework lets you run your functions in an environment that's similar to production, to speed up development and testing.
-
-Lets test the function locally:
-
-```
-# Build the dist folder
-`npm run build`
-
-# cd into the event function folder
-`cd dist/functions/events/helloWorld`
-
-# run the following command:
-`npx @google-cloud/functions-framework --target=myCloudEventFunction`
-
+```zsh
+npm run send
 ```
 
-we now have an endpoint running on `URL: http://localhost:8080/` and we can send a post request to the endpoint with a cloud event.
+This script uses `src/sendMessage.ts` to publish a message to the "test-topic" topic.
 
-### sending a cloudevent
+### Listen for Messages
 
-Once we have the endpoint running locally, we can send a cloudevent to it either with a post request or by using.
+To listen for messages on the subscription:
 
-https://github.com/cloudevents/sdk-javascript
+```zsh
+npm run listen
+```
 
-```javascript
+This script uses `src/listen.ts` to listen for messages on the "test-sub-1" subscription and process them, including parsing CloudEvents.
+
+## Cloud Functions
+
+### Testing a Function Locally
+
+1. Build the project:
+
+   ```
+   npm run build
+   ```
+
+2. Navigate to the function directory:
+
+   ```
+   cd dist/functions/events/helloWorld
+   ```
+
+3. Run the function locally:
+   ```
+   npx @google-cloud/functions-framework --target=myCloudEventFunction
+   ```
+
+This will start a local server at `http://localhost:8080/`.
+
+### Sending a CloudEvent to a Local Function
+
+Use the following code to send a CloudEvent to your local function:
+
+```js
 import { httpTransport, emitterFor, CloudEvent, CloudEventV1 } from "cloudevents";
-
-// Create an emitter to send events to a receiver
 const emit = emitterFor(httpTransport("http://localhost:8080/"));
 
-// Create a new CloudEvent
 const ce: CloudEventV1<string> = {
   specversion: "1.0",
   source: "/some/source",
@@ -95,30 +101,33 @@ const ce: CloudEventV1<string> = {
   id: "1234",
   data: JSON.stringify({ foo: "bar" })
 };
+
 const event = new CloudEvent(ce);
 
-console.log(event);
-// Send it to the endpoint - encoded as HTTP binary by default
 emit(event);
 ```
 
-Simply run `npm run dev` and the above code will send a cloudevent to the local endpoint.
+Run this code using:
 
-```
-Hello, World! {
-  id: '1234',
-  time: '2024-08-26T19:57:06.068Z',
-  type: 'example',
-  source: '/some/source',
-  specversion: '1.0',
-  data: { foo: 'bar' }
-}
+```zsh
+npm run dev
 ```
 
-### deploying a function
+### Deploying a Function
 
-https://cloud.google.com/functions/docs/deploy
+To deploy your function to Google Cloud Functions, follow the [official deployment guide](https://cloud.google.com/functions/docs/deploy).
 
-### terraform
+## Additional Resources
 
-https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudfunctions_function
+- [Google Cloud Pub/Sub Documentation](https://cloud.google.com/pubsub/docs)
+- [Cloud Functions Documentation](https://cloud.google.com/functions/docs)
+- [CloudEvents SDK for JavaScript](https://github.com/cloudevents/sdk-javascript)
+- [Terraform Google Cloud Functions Resource](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudfunctions_function)
+
+## Contributing
+
+Feel free to submit issues or pull requests if you have suggestions for improvements or find any bugs.
+
+<!-- ## License
+
+[Include your license information here] -->
